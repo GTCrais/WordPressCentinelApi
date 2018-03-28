@@ -1,14 +1,36 @@
 <?php
 
+require_once(CENTINELPATH . '/app/Admin/CentinelApiZipChecker.php');
+
 class CentinelApiAdminRequestHandler
 {
 	protected $validated = false;
 
+	public function checkZipAvailability()
+	{
+		$this->authorize();
+
+		try {
+			$zipCheck = new CentinelApiZipChecker();
+			$data = $zipCheck->check();
+
+			if ($data['notice'] == 'success') {
+				CentinelApiMessageManager::setSuccess($data['message']);
+			} else {
+				CentinelApiMessageManager::setError($data['message']);
+			}
+		} catch (Exception $e) {
+			$message = "An error has occurred while checking for Zip availability: " . $e->getMessage();
+			CentinelApiMessageManager::setError($message);
+		}
+
+		header('Location: ' . admin_url('options-general.php?page=centinel-api'));
+		exit();
+	}
+
 	public function updateSettings()
 	{
-		if (!is_admin()) {
-			throw new Exception("User does not have privileges to access Centinel API settings.");
-		}
+		$this->authorize();
 
 		if (!empty($_POST)) {
 			$input = $this->input();
@@ -25,6 +47,18 @@ class CentinelApiAdminRequestHandler
 
 		header('Location: ' . admin_url('options-general.php?page=centinel-api'));
 		exit();
+	}
+
+	protected function authorize()
+	{
+		$user = wp_get_current_user();
+		if (!in_array('administrator', (array) $user->roles)) {
+			throw new Exception("User does not have privileges to access Centinel API settings.");
+		}
+
+		if (!is_admin()) {
+			throw new Exception("User does not have privileges to access Centinel API settings.");
+		}
 	}
 
 	protected function updateOptions($input)

@@ -19,6 +19,18 @@
 	<?php endif; ?>
 
 	<form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+		<input type='hidden' name='action' value='centinel_api_zip_submit' />
+		<input type='hidden' name='option_page' value='<?php echo esc_attr('centinel_api_zip') ?>' />
+
+		<h2>Check Zip Availability</h2>
+
+		<?php
+		wp_nonce_field("centinel_api_zip");
+		submit_button('Check');
+		?>
+	</form>
+
+	<form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
 		<input type='hidden' name='action' value='centinel_api_submit' />
 		<input type='hidden' name='option_page' value='<?php echo esc_attr('centinel_api_options') ?>' />
 

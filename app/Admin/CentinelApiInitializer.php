@@ -20,6 +20,10 @@ class CentinelApiInitializer
 		register_activation_hook($pluginIndex, [$this, 'addOptions']);
 		register_uninstall_hook($pluginIndex, 'CentinelApiInitializer::removeOptions');
 
+		add_action('admin_post_centinel_api_zip_submit', function() {
+			$this->requestHandler->checkZipAvailability();
+		});
+
 		add_action('admin_post_centinel_api_submit', function() {
 			$this->requestHandler->updateSettings();
 		});
