@@ -18,8 +18,6 @@ Centinel API is designed to work in combination with [**Centinel**](https://cent
 After installing the plugin, go to `Settings > Centinel API Settings` in your WordPress Admin zone.
 From there, copy `privateKey`, `encryptionKey` and `routePrefix` to [**Centinel**](https://centinel.online), and you're ready to schedule your application log checks and database backups.
 
-You can read more about these options in [**WordPress documentation**](https://codex.wordpress.org/Debugging_in_WordPress)
-
 ### Settings
 
 - `Private Key` - random string, used for authentication  
@@ -56,6 +54,8 @@ define('WP_DEBUG', true);
 define('WP_DEBUG_LOG', true);
 define('WP_DEBUG_DISPLAY', false);
 ```
+
+You can read more about these options in [**WordPress documentation**](https://codex.wordpress.org/Debugging_in_WordPress)
 
 ### Database Backups
 
