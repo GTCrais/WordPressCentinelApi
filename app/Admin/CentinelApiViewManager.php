@@ -119,6 +119,19 @@ class CentinelApiViewManager
 			'centinel-api',
 			'centinel-api-mysql'
 		);
+
+		add_settings_field(
+			'centinel_api_dump_binary_path',
+			'Dump Binary Path',
+			function($args) {
+				$fieldName = 'centinel_api_dump_binary_path';
+				$setting = get_option($fieldName);
+
+				include(CENTINELPATH . '/views/inputFields/text.php');
+			},
+			'centinel-api',
+			'centinel-api-mysql'
+		);
 	}
 
 	protected function registerGeneralSettings()

@@ -80,6 +80,7 @@ class CentinelApiInitializer
 			'centinel_api_dont_use_extended_inserts' => 0,
 			'centinel_api_use_single_transaction' => 0,
 			'centinel_api_default_character_set' => '',
+			'centinel_api_dump_binary_path' => '',
 		];
 	}
 }

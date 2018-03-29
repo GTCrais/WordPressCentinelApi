@@ -3,7 +3,7 @@
 
 	<div>
 		<p class="description">
-			Check <a href='#' target='_blank'>Centinel API GitHub page</a> for details.
+			Check <a href='https://github.com/GTCrais/WordPressCentinelApi' target='_blank'>Centinel API GitHub page</a> for details.
 		</p>
 		<br>
 	</div>

@@ -117,6 +117,10 @@ class CentinelApiAdminRequestHandler
 			'centinel_api_dont_use_extended_inserts' => !empty($_POST['centinel_api_dont_use_extended_inserts']) ? 1 : 0,
 			'centinel_api_use_single_transaction' => !empty($_POST['centinel_api_use_single_transaction']) ? 1 : 0,
 			'centinel_api_default_character_set' => isset($_POST['centinel_api_default_character_set']) ? trim($_POST['centinel_api_default_character_set']) : '',
+			'centinel_api_dump_binary_path' =>
+				isset($_POST['centinel_api_dump_binary_path']) ?
+				str_replace("\\\\", "\\", trim($_POST['centinel_api_dump_binary_path'])) :
+				'',
 		];
 
 		// todo: use this logic when dumping database

@@ -29,7 +29,8 @@ From there, copy `privateKey`, `encryptionKey` and `routePrefix` to [**Centinel*
 - `Zip Password` - password used when zipping the database dump
 - `MySQL Settings` - various database dump options
 
-All MySQL settings are optional.
+All MySQL settings are optional. If you're developing on Windows (WAMP, for example), you may want to set your `Dump Binary Path` to something like
+`'C:\Progra~1\wamp\bin\mysql\mysql5.7.18\bin'`.
 
 Some MySQL settings will be ignored for PHP 5.6.  
 For more details check [Spatie DB Dumper v1.5.1](https://github.com/spatie/db-dumper/tree/1.5.1)
