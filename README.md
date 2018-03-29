@@ -27,6 +27,7 @@ From there, copy `privateKey`, `encryptionKey` and `routePrefix` to [**Centinel*
 - `Database Routes Enabled` - disable if you do not wish to send database dumps to Centinel
 - `Disable Time Based Authorization` - check this option in case of your server's and Centinel's datetime being out of sync which results in `Request time mismatch` or `Too many API calls` error
 - `Zip Password` - password used when zipping the database dump
+- `Dump Folder` - folder where the database dumps are going to be created. All database dumps, along with this folder, are always deleted after being sent to Centinel.
 - `MySQL Settings` - various database dump options
 
 All MySQL settings are optional. If you're developing on Windows (WAMP, for example), you may want to set your `Dump Binary Path` to something like

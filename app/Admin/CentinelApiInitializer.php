@@ -40,7 +40,7 @@ class CentinelApiInitializer
 
 	public static function removeOptions()
 	{
-		$optionList = self::statisOptionList();
+		$optionList = self::staticOptionList();
 
 		foreach ($optionList as $optionName => $optionValue) {
 			delete_option($optionName);
@@ -53,17 +53,19 @@ class CentinelApiInitializer
 		$encryptionKey = $this->helpers->randomString();
 		$routePrefix = rest_get_url_prefix() . '/' . $this->helpers->randomString();
 		$zipPassword = $this->helpers->randomString();
+		$dumpFolder = $this->helpers->randomString();
 
-		$optionList = self::statisOptionList();
+		$optionList = self::staticOptionList();
 		$optionList['centinel_api_private_key'] = $privateKey;
 		$optionList['centinel_api_encryption_key'] = $encryptionKey;
 		$optionList['centinel_api_route_prefix'] = $routePrefix;
 		$optionList['centinel_api_zip_password'] = $zipPassword;
+		$optionList['centinel_api_dump_folder'] = $dumpFolder;
 
 		return $optionList;
 	}
 
-	public static function statisOptionList()
+	public static function staticOptionList()
 	{
 		return [
 			'centinel_api_private_key' => null,
@@ -73,7 +75,9 @@ class CentinelApiInitializer
 			'centinel_api_database_routes_enabled' => 1,
 			'centinel_api_disable_time_based_authorization' => 0,
 			'centinel_api_zip_password' => null,
+			'centinel_api_dump_folder' => null,
 
+			'centinel_api_timeout' => 120,
 			'centinel_api_include_tables' => '',
 			'centinel_api_exclude_tables' => '',
 			'centinel_api_dont_skip_comments' => 0,

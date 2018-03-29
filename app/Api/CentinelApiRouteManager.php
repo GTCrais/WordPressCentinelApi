@@ -30,5 +30,19 @@ class CentinelApiRouteManager
 				'callback' => [$apiController, 'downloadLog']
 			]
 		]);
+
+		register_rest_route($routePrefix, '/dump-database', [
+			[
+				'methods' => 'POST',
+				'callback' => [$apiController, 'dumpDatabase']
+			]
+		]);
+
+		register_rest_route($routePrefix, '/download-database', [
+			[
+				'methods' => 'POST',
+				'callback' => [$apiController, 'downloadDatabase']
+			]
+		]);
 	}
 }

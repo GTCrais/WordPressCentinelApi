@@ -9,6 +9,8 @@ if (version_compare(PHP_VERSION, '7.0', '<')) {
 require_once(CENTINELPATH . '/app/Api/CentinelApiRouteManager.php');
 require_once(CENTINELPATH . '/app/Admin/CentinelApiHelpers.php');
 require_once(CENTINELPATH . '/app/Middleware/CentinelApiAuthorizeRequest.php');
+require_once(CENTINELPATH . '/app/Api/CentinelApiDatabase.php');
+require_once(CENTINELPATH . '/app/Api/CentinelApiZipper.php');
 
 class CentinelApiApiController
 {
@@ -50,7 +52,8 @@ class CentinelApiApiController
 
 				$filesize = filesize($filePath);
 				$foldersData = $this->createLogFolders();
-				$newFilePath = 'logs/y' . $foldersData['year'] . '/m' . $foldersData['month'] . '/' . (date('Y-m-d__H_i_s')) . '.log';
+				$randomString = $this->helpers->randomString();
+				$newFilePath = 'logs/y' . $foldersData['year'] . '/m' . $foldersData['month'] . '/' . (date('Y-m-d__H_i_s')) . '_' . $randomString . '.log';
 
 				file_put_contents(ABSPATH . '/wp-content/' . $newFilePath, $logContents);
 				file_put_contents($filePath, '');
@@ -62,10 +65,11 @@ class CentinelApiApiController
 				$data['message'] = "Log file doesn't exist";
 			}
 		} catch (\Exception $e) {
-			$this->helpers->writeLog($e);
+			$this->helpers->writeLog($e->getMessage());
 			$data['message'] = "Error while creating the log file: " . $e->getMessage();
 		}
 
+		http_response_code(200);
 		return $data;
 	}
 
@@ -93,6 +97,96 @@ class CentinelApiApiController
 		exit();
 	}
 
+	public function dumpDatabase()
+	{
+		if (!$this->middleware->authorize('centinelApiDatabaseDump')) {
+			http_response_code(401);
+			exit;
+		}
+
+		$data = $this->getDefaultDataSet();
+
+		try {
+			$this->createDbDumpFolder();
+			$this->emptyDbDumpFolder();
+
+			$filename = CentinelApiDatabase::dump();
+			$fullPath = CentinelApiDatabase::getDumpPath($filename);
+			$zipFilename = $this->zipDatabase($fullPath);
+			$fullPath = $zipFilename ? CentinelApiDatabase::getDumpPath($zipFilename) : $fullPath;
+			$filesize = filesize($fullPath);
+
+			$data['success'] = true;
+			$data['filesize'] = $filesize;
+			$data['filePath'] = $zipFilename ?: $filename;
+		} catch (\Exception $e) {
+			$this->emptyDbDumpFolder();
+			$this->deleteDbDumpFolder();
+			$this->helpers->writeLog($e->getMessage());
+			$data['message'] = "Error while dumping database: " . $e->getMessage();
+		}
+
+		http_response_code(200);
+		return $data;
+	}
+
+	public function downloadDatabase()
+	{
+		if (!$this->middleware->authorize('centinelApiDatabaseDownload')) {
+			http_response_code(401);
+			exit;
+		}
+
+		$filename = isset($_POST['filePath']) ? $_POST['filePath'] : null;
+		$fullFilePath = CentinelApiDatabase::getDumpPath($filename);
+
+		if (!$filename || !file_exists($fullFilePath)) {
+			http_response_code(422);
+			exit;
+		}
+
+		ignore_user_abort(true);
+
+		http_response_code(200);
+		header("Content-Description: File Transfer");
+		header("Content-Type: application/octet-stream");
+		header("Content-Disposition: attachment; filename='" . $fullFilePath . "'");
+
+		readfile($fullFilePath);
+
+		unlink($fullFilePath);
+		$this->deleteDbDumpFolder();
+
+		exit();
+	}
+
+	protected function zipDatabase($filePath)
+	{
+		$randomString = $this->helpers->randomString();
+		$zipFilename = 'databasedump_' . $randomString . '.zip';
+		$zipPath = CentinelApiDatabase::getDumpPath($zipFilename);
+
+		// Try 7-zip
+		CentinelApiZipper::create7zip($filePath, $zipPath);
+
+		// Try regular zip
+		if (!file_exists($zipPath)) {
+			CentinelApiZipper::createRegularZip($filePath, $zipPath);
+		}
+
+		// If Zip file was created successfully
+		// return Zip filename
+		if (file_exists($zipPath)) {
+			if (file_exists($filePath)) {
+				unlink($filePath);
+			}
+
+			return $zipFilename;
+		}
+
+		return null;
+	}
+
 	protected function createLogFolders()
 	{
 		$year = date("Y");
@@ -104,12 +198,58 @@ class CentinelApiApiController
 			if (!is_dir($folder)) {
 				mkdir($folder);
 			}
+
+			$indexPhp = $folder . '/index.php';
+
+			if (!file_exists($indexPhp)) {
+				file_put_contents($indexPhp, '<?php');
+			}
 		}
 
 		return [
 			'year' => $year,
 			'month' => $month
 		];
+	}
+
+	protected function createDbDumpFolder()
+	{
+		$folder = CentinelApiDatabase::getDumpPath();
+
+		if (!is_dir($folder)) {
+			mkdir($folder);
+		}
+
+		$indexPhp = $folder . '/index.php';
+
+		if (!file_exists($indexPhp)) {
+			file_put_contents($indexPhp, '<?php');
+		}
+	}
+
+	protected function emptyDbDumpFolder()
+	{
+		$folder = CentinelApiDatabase::getDumpPath();
+
+		foreach (new \DirectoryIterator($folder) as $fileInfo) {
+			if (!$fileInfo->isDot() && $fileInfo->getFilename() != 'index.php') {
+				unlink($fileInfo->getPath() . '/' . $fileInfo->getFilename());
+			}
+		}
+	}
+
+	protected function deleteDbDumpFolder()
+	{
+		$folder = CentinelApiDatabase::getDumpPath();
+		$indexPhp = $folder . '/index.php';
+
+		if (file_exists($indexPhp)) {
+			unlink($indexPhp);
+		}
+
+		if (is_dir($folder)) {
+			rmdir($folder);
+		}
 	}
 
 	protected function getLogFolderPaths($year, $month)
@@ -143,20 +283,5 @@ class CentinelApiApiController
 			'platform' => $this->getPlatform(),
 			'platformVersion' => $this->getPlatformVersion()
 		];
-	}
-
-
-
-	public function test()
-	{
-		$dumper = \Spatie\DbDumper\Databases\MySql::create();
-		$binaryPath = get_option('centinel_api_dump_binary_path');
-
-		$dumper->setDbName(DB_NAME)
-			->setUserName(DB_USER)
-			->setPassword(DB_PASSWORD)
-			->setHost(DB_HOST)
-			->setDumpBinaryPath($binaryPath)
-			->dumpToFile(ABSPATH . '/database.sql');
 	}
 }

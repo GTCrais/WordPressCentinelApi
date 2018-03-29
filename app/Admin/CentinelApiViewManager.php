@@ -41,6 +41,19 @@ class CentinelApiViewManager
 	protected function registerMySqlSettings()
 	{
 		add_settings_field(
+			'centinel_api_timeout',
+			'Timeout',
+			function($args) {
+				$fieldName = 'centinel_api_timeout';
+				$setting = get_option($fieldName);
+
+				include(CENTINELPATH . '/views/inputFields/text.php');
+			},
+			'centinel-api',
+			'centinel-api-mysql'
+		);
+
+		add_settings_field(
 			'centinel_api_include_tables',
 			'Include Tables',
 			function($args) {
@@ -226,6 +239,19 @@ class CentinelApiViewManager
 			'Zip Password',
 			function($args) {
 				$fieldName = 'centinel_api_zip_password';
+				$setting = get_option($fieldName);
+
+				include(CENTINELPATH . '/views/inputFields/text.php');
+			},
+			'centinel-api',
+			'centinel-api-general'
+		);
+
+		add_settings_field(
+			'centinel_api_dump_folder',
+			'Dump Folder',
+			function($args) {
+				$fieldName = 'centinel_api_dump_folder';
 				$setting = get_option($fieldName);
 
 				include(CENTINELPATH . '/views/inputFields/text.php');

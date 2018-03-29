@@ -93,6 +93,14 @@ class CentinelApiAdminRequestHandler
 			$messages[] = 'Zip Password cannot be empty.';
 		}
 
+		if (empty($input['centinel_api_dump_folder'])) {
+			$messages[] = 'Dump Folder cannot be empty.';
+		}
+
+		if (!empty($input['centinel_api_timeout']) && !preg_match('/^[1-9][0-9]*$/', $input['centinel_api_timeout'])) {
+			$messages[] = 'Timeout must be a number.';
+		}
+
 		if (!$messages) {
 			$this->validated = true;
 		}
@@ -110,7 +118,9 @@ class CentinelApiAdminRequestHandler
 			'centinel_api_database_routes_enabled' => !empty($_POST['centinel_api_database_routes_enabled']) ? 1 : 0,
 			'centinel_api_disable_time_based_authorization' => !empty($_POST['centinel_api_disable_time_based_authorization']) ? 1 : 0,
 			'centinel_api_zip_password' => isset($_POST['centinel_api_zip_password']) ? trim($_POST['centinel_api_zip_password']) : '',
+			'centinel_api_dump_folder' => isset($_POST['centinel_api_dump_folder']) ? trim($_POST['centinel_api_dump_folder']) : '',
 
+			'centinel_api_timeout' => isset($_POST['centinel_api_timeout']) ? trim($_POST['centinel_api_timeout']) : '',
 			'centinel_api_include_tables' => isset($_POST['centinel_api_include_tables']) ? trim($_POST['centinel_api_include_tables']) : '',
 			'centinel_api_exclude_tables' => isset($_POST['centinel_api_exclude_tables']) ? trim($_POST['centinel_api_exclude_tables']) : '',
 			'centinel_api_dont_skip_comments' => !empty($_POST['centinel_api_dont_skip_comments']) ? 1 : 0,
@@ -122,34 +132,5 @@ class CentinelApiAdminRequestHandler
 				str_replace("\\\\", "\\", trim($_POST['centinel_api_dump_binary_path'])) :
 				'',
 		];
-
-		// todo: use this logic when dumping database
-
-		/*$trimmedTables = [];
-		if ($input['centinel_api_include_tables']) {
-			$tables = explode(',', $input['centinel_api_include_tables']);
-
-			foreach ($tables as $table) {
-				$trimmedTables[] = trim($table);
-			}
-
-			$input['centinel_api_include_tables'] = $trimmedTables;
-		} else {
-			$input['centinel_api_include_tables'] = $trimmedTables;
-		}
-
-		$trimmedTables = [];
-		if ($input['centinel_api_exclude_tables']) {
-			$tables = explode(',', $input['centinel_api_exclude_tables']);
-			$trimmedTables = [];
-
-			foreach ($tables as $table) {
-				$trimmedTables[] = trim($table);
-			}
-
-			$input['centinel_api_exclude_tables'] = $trimmedTables;
-		} else {
-			$input['centinel_api_exclude_tables'] = $trimmedTables;
-		}*/
 	}
 }
