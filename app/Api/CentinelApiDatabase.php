@@ -49,8 +49,8 @@ class CentinelApiDatabase
 			$dumper = $dumper->setHost(DB_HOST);
 		}
 
-		if (isset($dumpOptions['dump_binary_path']) && method_exists($dumper, 'setDumpBinaryPath')) {
-			$dumper = $dumper->setDumpBinaryPath($dumpOptions['dump_binary_path']);
+		if (isset($dumpOptions['dumpBinaryPath']) && method_exists($dumper, 'setDumpBinaryPath')) {
+			$dumper = $dumper->setDumpBinaryPath($dumpOptions['dumpBinaryPath']);
 		}
 
 		if (isset($dumpOptions['timeout']) && method_exists($dumper, 'setTimeout')) {
@@ -123,7 +123,7 @@ class CentinelApiDatabase
 			'dontUseExtendedInserts' => get_option('centinel_api_dont_use_extended_inserts'),
 			'useSingleTransaction' => get_option('centinel_api_use_single_transaction'),
 			'setDefaultCharacterSet' => get_option('centinel_api_default_character_set') ?: null,
-			'dump_binary_path' => get_option('centinel_api_dump_binary_path') ?: null,
+			'dumpBinaryPath' => get_option('centinel_api_dump_binary_path') ?: null,
 		];
 	}
 
