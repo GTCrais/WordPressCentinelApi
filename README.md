@@ -11,7 +11,10 @@ Centinel API is designed to work in combination with [**Centinel**](https://cent
 
 ## Installation
 
-- {placeholder}
+- download ZIP file
+- create `centinel-api` folder in the `/wp-content/plugins` folder
+- extract files from `WordPressCentinelApi` folder in the ZIP file to `/wp-content/plugins/centinel-api`
+- activate the plugin
 
 ## Usage
 
