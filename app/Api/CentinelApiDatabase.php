@@ -1,6 +1,9 @@
 <?php
 
-require_once(CENTINELPATH . '/app/Api/CentinelApiMySql.php');
+if (!class_exists('Spatie\DbDumper\Databases\Sqlite')) {
+	require_once(CENTINELPATH . '/app/Api/CentinelApiMySql.php');
+}
+
 require_once(CENTINELPATH . '/app/Admin/CentinelApiHelpers.php');
 
 class CentinelApiDatabase
