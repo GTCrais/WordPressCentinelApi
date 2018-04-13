@@ -19,6 +19,18 @@ class CentinelApiZipChecker
 			file_put_contents($filePath, '');
 		}
 
+		CentinelApiZipper::createNativeZip($filePath, $zipPath);
+
+		if (file_exists($zipPath)) {
+			unlink($zipPath);
+
+			$data['message'] = "You're using PHP version " . PHP_VERSION . " so native Zip encryption is available! Your database dumps will be zipped and encrypted with AES-256.";
+
+			return $data;
+		}
+
+		$messages[] = "Native Zip encryption is not available.";
+
 		CentinelApiZipper::create7zip($filePath, $zipPath);
 
 		if (file_exists($zipPath)) {

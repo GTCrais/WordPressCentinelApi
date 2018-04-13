@@ -2,7 +2,7 @@
 
 This package provides API for downloading the application log file, and dumping and downloading the database. It ships with authentication middleware which protects the API routes.
 
-Centinel API is designed to work in combination with [**Centinel**](https://centinel.online) - centralized application management system. 
+Centinel API is designed to work in combination with [**Centinel**](https://centinel.online) - centralized application management system for off-site database backups and application log checks.
 
 ## Requirements
 
@@ -66,10 +66,13 @@ You can read more about these options in [**WordPress documentation**](https://c
 
 [Spatie DB Dumper](https://github.com/spatie/db-dumper) is used to make database dumps. **MySQL** is supported, and requires `mysqldump` utility.
 
-Centinel API will try to zip and password protect database dumps before sending them to Centinel. It will look for 7-Zip and Zip
-libraries to do so. If neither library is available, dumps will be sent without being zipped and password protected.
+Centinel API will try to zip and password protect database dumps before sending them to Centinel. In case you're using PHP 7.2+, it will use 
+PHP's native `ZipArchive` class to zip and encrypt the database. Otherwise, it will look for 7-Zip and Zip libraries to do so. If no option 
+is available, dumps will be sent without being zipped and password protected.
 
-Run `Check Zip Availability` in Centinel API Settings to see which library is available on your server. Note that Zip encryption algorithm is much less secure than that of 7-Zip. Ultimately it is up to you to decide which level of security is satisfactory. You can always opt out of backing up your database by disabling database backups in Centinel, and additionally, unchecking `Database Routes Enabled` in the settings.
+Run `Check Zip Availability` in Centinel API Settings to see which library is available on your server. Note that Zip encryption algorithm is much 
+less secure than that of ZipArchive and 7-Zip. Ultimately it is up to you to decide which level of security is satisfactory. You can always opt out of backing up 
+your database by disabling database backups in Centinel, and additionally, unchecking `Database Routes Enabled` in the settings.
 
 ### Authentication
 
@@ -77,4 +80,4 @@ For details check `/app/Middleware/CentinelApiAuthorizeRequest.php` middleware.
 
 ## License
 
-Laravel Centinel API is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+WordPress Centinel API is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
