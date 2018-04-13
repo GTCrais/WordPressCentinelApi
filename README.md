@@ -18,6 +18,8 @@ Centinel API is designed to work in combination with [**Centinel**](https://cent
 
 ## Usage
 
+**It's highly recommended to use this plugin only on websites that use HTTPS!**
+
 After installing the plugin, go to `Settings > Centinel API Settings` in your WordPress Admin zone.
 From there, copy `privateKey`, `encryptionKey` and `routePrefix` to [**Centinel**](https://centinel.online), and you're ready to schedule your application log checks and database backups.
 
