@@ -94,7 +94,7 @@ class CentinelApiApiController
 		header("Content-Disposition: attachment; filename='" . $fullFilePath . "'");
 
 		readfile($fullFilePath);
-		exit();
+		exit;
 	}
 
 	public function dumpDatabase()
@@ -157,7 +157,7 @@ class CentinelApiApiController
 		unlink($fullFilePath);
 		$this->deleteDbDumpFolder();
 
-		exit();
+		exit;
 	}
 
 	protected function zipDatabase($filePath)
@@ -198,8 +198,9 @@ class CentinelApiApiController
 		$month = date("m");
 
 		$folders = $this->getLogFolderPaths($year, $month);
+		$htAccessPath = CENTINELPATH . '/.htaccess';
 
-		foreach ($folders as $folder) {
+		foreach ($folders as $folderType => $folder) {
 			if (!is_dir($folder)) {
 				mkdir($folder);
 			}
@@ -208,6 +209,10 @@ class CentinelApiApiController
 
 			if (!file_exists($indexPhp)) {
 				file_put_contents($indexPhp, '<?php');
+			}
+
+			if ($folderType == 'year' && !file_exists($folder . '/.htaccess') && file_exists($htAccessPath)) {
+				copy($htAccessPath, $folder . '/.htaccess');
 			}
 		}
 
@@ -226,9 +231,14 @@ class CentinelApiApiController
 		}
 
 		$indexPhp = $folder . '/index.php';
+		$htAccessPath = CENTINELPATH . '/.htaccess';
 
 		if (!file_exists($indexPhp)) {
 			file_put_contents($indexPhp, '<?php');
+		}
+
+		if (!file_exists($folder . '/.htaccess') && file_exists($htAccessPath)) {
+			copy($htAccessPath, $folder . '/.htaccess');
 		}
 	}
 
@@ -237,7 +247,7 @@ class CentinelApiApiController
 		$folder = CentinelApiDatabase::getDumpPath();
 
 		foreach (new \DirectoryIterator($folder) as $fileInfo) {
-			if (!$fileInfo->isDot() && $fileInfo->getFilename() != 'index.php') {
+			if (!$fileInfo->isDot() && !in_array($fileInfo->getFilename(), ['index.php', '.htaccess'])) {
 				unlink($fileInfo->getPath() . '/' . $fileInfo->getFilename());
 			}
 		}
@@ -247,9 +257,14 @@ class CentinelApiApiController
 	{
 		$folder = CentinelApiDatabase::getDumpPath();
 		$indexPhp = $folder . '/index.php';
+		$htAccess = $folder . '/.htaccess';
 
 		if (file_exists($indexPhp)) {
 			unlink($indexPhp);
+		}
+
+		if (file_exists($htAccess)) {
+			unlink($htAccess);
 		}
 
 		if (is_dir($folder)) {
@@ -260,9 +275,9 @@ class CentinelApiApiController
 	protected function getLogFolderPaths($year, $month)
 	{
 		return [
-			ABSPATH . '/wp-content/logs',
-			ABSPATH . '/wp-content/logs/y' . $year,
-			ABSPATH . '/wp-content/logs/y' . $year . '/m' . $month
+			'base' => ABSPATH . '/wp-content/logs',
+			'year' => ABSPATH . '/wp-content/logs/y' . $year,
+			'month' => ABSPATH . '/wp-content/logs/y' . $year . '/m' . $month
 		];
 	}
 
